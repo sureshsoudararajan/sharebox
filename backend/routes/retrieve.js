@@ -20,8 +20,7 @@ router.get('/:id', async (req, res) => {
         responseType: 'arraybuffer'
       });
 
-      const encryptedBuffer = Buffer.from(response.data, 'binary');
-      const decryptedBuffer = decrypt(encryptedBuffer.toString('hex'), fileInfo.iv);
+      const decryptedBuffer = response.data;
 
       res.set('Content-Type', fileInfo.mimetype);
       if (!fileInfo.mimetype.startsWith('image/')) {

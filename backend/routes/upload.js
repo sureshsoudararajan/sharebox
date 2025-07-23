@@ -29,9 +29,7 @@ router.post('/file', upload.single('shareFile'), async (req, res) => {
   }
 
   try {
-    const { iv, encryptedData } = encrypt(req.file.buffer);
-
-    const encryptedBuffer = Buffer.from(encryptedData, 'hex');
+    const encryptedBuffer = req.file.buffer;
 
     const safeFilename = encodeURIComponent(req.file.originalname);
     const response = await axios.put(`https://transfer.sh/${safeFilename}`, encryptedBuffer, {
@@ -58,7 +56,7 @@ router.post('/file', upload.single('shareFile'), async (req, res) => {
     }
   } catch (error) {
     console.error('Error uploading file:', error.message);
-    res.status(500).json({ error: 'An error occurred while sharing the file.' });
+    res.status(500).json({ error: `An error occurred while sharing the file: ${error.message}` });
   }
 });
 

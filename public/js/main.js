@@ -119,11 +119,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 window.location.href = redirectUrl;
             } else {
-                alert('An error occurred while sharing file.');
+                alert(`Error: ${data.error}`);
             }
         } catch (error) {
             console.error('Error sharing file:', error);
-            alert('An error occurred while sharing file.');
+            alert(`Error: ${data.error}`);
         }
     });
 });
