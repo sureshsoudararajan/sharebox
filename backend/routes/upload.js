@@ -1,7 +1,6 @@
 const express = require('express');
 const multer = require('multer');
 const axios = require('axios');
-const FormData = require('form-data');
 const { encrypt } = require('../utils/cryptoUtils');
 const generateId = require('../utils/generateId');
 
@@ -32,14 +31,12 @@ router.post('/file', upload.single('shareFile'), async (req, res) => {
   try {
     const { iv, encryptedData } = encrypt(req.file.buffer);
 
-    const formData = new FormData();
-    formData.append('file', Buffer.from(encryptedData, 'hex'), {
-      filename: req.file.originalname,
-      contentType: req.file.mimetype
-    });
+    const encryptedBuffer = Buffer.from(encryptedData, 'hex');
 
-    const response = await axios.post('http://0x0.st', formData, {
-      headers: formData.getHeaders()
+    const response = await axios.put(`https://transfer.sh/${req.file.originalname}`, encryptedBuffer, {
+      headers: {
+        'Content-Type': 'application/octet-stream'
+      }
     });
 
     if (response.status === 200 && response.data.trim().startsWith('http')) {
