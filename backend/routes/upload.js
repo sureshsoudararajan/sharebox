@@ -48,14 +48,22 @@ router.post('/file', upload.single('shareFile'), async (req, res) => {
         originalname: req.file.originalname,
         mimetype: req.file.mimetype,
         size: req.file.size,
-        iv: iv
       };
       res.json({ id: id, type: type, originalname: req.file.originalname });
     } else {
-      throw new Error('Failed to upload file to 0x0.st');
+      throw new Error('Failed to upload file to transfer.sh: Unexpected response.');
     }
   } catch (error) {
     console.error('Error uploading file:', error.message);
+    if (error.response) {
+      console.error('Axios error response data:', error.response.data);
+      console.error('Axios error response status:', error.response.status);
+      console.error('Axios error response headers:', error.response.headers);
+    } else if (error.request) {
+      console.error('Axios error request:', error.request);
+    } else {
+      console.error('Axios error config:', error.config);
+    }
     res.status(500).json({ error: `An error occurred while sharing the file: ${error.message}` });
   }
 });
