@@ -10,6 +10,8 @@ A simple file/image/text sharing website without login, allowing one user to pas
 *   Shareable link
 *   No login
 
+**Note:** This application uses an external service (0x0.st) for file storage to ensure persistence across deployments.
+
 ## Project Structure
 
 ```
@@ -19,9 +21,6 @@ sharebox/
 │   ├── routes/
 │   │   ├── upload.js            # Handle uploads (text, files, images)
 │   │   ├── retrieve.js          # Serve text/file/image by ID
-│   ├── storage/
-│   │   ├── files/               # Uploaded files
-│   │   └── images/              # Uploaded images
 │   └── utils/
 │       └── generateId.js        # Unique ID generator
 │
