@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShareBox - Your Link</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Your Shareable Link</h1>
+        <p>Copy the link below to share your content:</p>
+        <div class="link-container">
+            <input type="text" id="share-link" readonly>
+            <button id="copy-link-btn">Copy Link</button>
+        </div>
+        <a href="/">Share something new</a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id');
+            const type = urlParams.get('type');
+            const originalname = urlParams.get('originalname');
+
+            let shareLink = `${window.location.origin}/view?id=${id}&type=${type}`;
+            if (originalname) {
+                shareLink += `&originalname=${encodeURIComponent(originalname)}`;
+            }
+            document.getElementById('share-link').value = shareLink;
+
+            document.getElementById('copy-link-btn').addEventListener('click', () => {
+                const linkInput = document.getElementById('share-link');
+                linkInput.select();
+                document.execCommand('copy');
+                alert('Link copied to clipboard!');
+            });
+        });
+    </script>
+</body>
+</html>

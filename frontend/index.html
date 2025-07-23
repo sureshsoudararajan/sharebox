@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShareBox - Share Text & Files</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>ShareBox</h1>
+        <div class="tabs">
+            <button class="tab-button active" data-tab="text">Text</button>
+            <button class="tab-button" data-tab="file">File</button>
+        </div>
+
+        <div id="text-tab" class="tab-content active">
+            <textarea id="text-content" placeholder="Paste your text here..."></textarea>
+            <button id="share-text-btn">Share Text</button>
+        </div>
+
+        <div id="file-tab" class="tab-content">
+            <div id="drop-area">
+                <p>Drag & Drop your file here, or click to select</p>
+                <input type="file" id="file-input" hidden>
+            </div>
+            <button id="share-file-btn">Share File</button>
+        </div>
+    </div>
+
+    <script src="/js/main.js"></script>
+</body>
+</html>
