@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             console.error('Error sharing file:', error);
-            alert('An error occurred while sharing file.');
+            alert(`Error: ${data.error}`);
         }
     });
 });

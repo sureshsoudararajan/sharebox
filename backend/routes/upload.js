@@ -60,7 +60,7 @@ router.post('/file', upload.single('shareFile'), async (req, res) => {
     }
   } catch (error) {
     console.error('Error uploading file:', error.message);
-    res.status(500).json({ error: 'An error occurred while sharing the file.' });
+    res.status(500).json({ error: `An error occurred while sharing the file: ${error.message}` });
   }
 });
 
