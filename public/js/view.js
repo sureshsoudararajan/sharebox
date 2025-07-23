@@ -2,14 +2,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('id');
     const type = urlParams.get('type');
-    const originalname = urlParams.get('originalname');
 
     const contentTitle = document.getElementById('content-title');
     const contentDisplay = document.getElementById('content-display');
+    const copyTextBtn = document.getElementById('copy-text-btn');
+    const copyPopup = document.getElementById('copy-popup');
 
     if (!id || !type) {
         contentTitle.textContent = 'Invalid Link';
         contentDisplay.innerHTML = '<p>The sharing link is incomplete or invalid.</p>';
+        copyTextBtn.style.display = 'none'; // Hide copy button
         return;
     }
 
@@ -19,24 +21,41 @@ document.addEventListener('DOMContentLoaded', async () => {
             const errorData = await response.json();
             contentTitle.textContent = 'Content Not Found';
             contentDisplay.innerHTML = `<p>${errorData.error || 'An error occurred.'}</p>`;
+            copyTextBtn.style.display = 'none'; // Hide copy button
             return;
         }
 
         if (type === 'text') {
             const data = await response.json();
             contentTitle.textContent = 'Shared Text';
-            contentDisplay.innerHTML = `<pre>${data.content}</pre>`;
-        } else if (type === 'image') {
-            contentTitle.textContent = originalname ? `Shared Image: ${originalname}` : 'Shared Image';
-            contentDisplay.innerHTML = `<img src="/retrieve/${id}" alt="Shared Image">`;
-        } else if (type === 'file') {
-            contentTitle.textContent = originalname ? `Shared File: ${originalname}` : 'Shared File';
-            contentDisplay.innerHTML = `<p>Click the button below to download the file:</p><a href="/retrieve/${id}" class="download-link" download="${originalname || id}">Download ${originalname || 'File'}</a>`;
+            // Display as plain text, preventing HTML rendering
+            const preElement = document.createElement('pre');
+            preElement.textContent = data.content; // Use textContent to prevent HTML rendering
+            contentDisplay.appendChild(preElement);
+
+            // Copy functionality
+            copyTextBtn.addEventListener('click', () => {
+                navigator.clipboard.writeText(data.content).then(() => {
+                    copyPopup.classList.add('show');
+                    setTimeout(() => {
+                        copyPopup.classList.remove('show');
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy text: ', err);
+                    alert('Failed to copy text.');
+                });
+            });
+        } else {
+            // This case should ideally not be reached if only text sharing is enabled
+            contentTitle.textContent = 'Unsupported Content Type';
+            contentDisplay.innerHTML = '<p>This content type is not supported for viewing.</p>';
+            copyTextBtn.style.display = 'none'; // Hide copy button
         }
 
     } catch (error) {
         console.error('Error fetching content:', error);
         contentTitle.textContent = 'Error';
         contentDisplay.innerHTML = '<p>An error occurred while loading the content.</p>';
+        copyTextBtn.style.display = 'none'; // Hide copy button
     }
 });

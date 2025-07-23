@@ -5,6 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ShareBox - View Content</title>
     <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .copy-popup {
+            visibility: hidden;
+            min-width: 150px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 5px;
+            padding: 8px 10px;
+            position: fixed;
+            z-index: 1;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 30px;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .copy-popup.show {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -12,8 +35,11 @@
         <div id="content-display">
             <!-- Content will be loaded here by JavaScript -->
         </div>
+        <button id="copy-text-btn" style="margin-top: 20px;">Copy Text</button>
         <a href="/">Share something new</a>
     </div>
+
+    <div id="copy-popup" class="copy-popup">Text Copied!</div>
 
     <script src="/js/view.js"></script>
 </body>
