@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.ok) {
                 window.location.href = `/result?id=${data.id}&type=${data.type}`;
             } else {
-                alert(`Error: ${data.error}`);
+                alert('An error occurred while sharing text.');
             }
         } catch (error) {
             console.error('Error sharing text:', error);
@@ -119,11 +119,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 window.location.href = redirectUrl;
             } else {
-                alert(`Error: ${data.error}`);
+                alert('An error occurred while sharing file.');
             }
         } catch (error) {
             console.error('Error sharing file:', error);
-            alert(`Error: ${data.error}`);
+            alert('An error occurred while sharing file.');
         }
     });
 });

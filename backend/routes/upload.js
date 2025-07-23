@@ -33,7 +33,8 @@ router.post('/file', upload.single('shareFile'), async (req, res) => {
 
     const encryptedBuffer = Buffer.from(encryptedData, 'hex');
 
-    const response = await axios.put(`https://transfer.sh/${req.file.originalname}`, encryptedBuffer, {
+    const safeFilename = encodeURIComponent(req.file.originalname);
+    const response = await axios.put(`https://transfer.sh/${safeFilename}`, encryptedBuffer, {
       headers: {
         'Content-Type': 'application/octet-stream'
       }
@@ -57,7 +58,7 @@ router.post('/file', upload.single('shareFile'), async (req, res) => {
     }
   } catch (error) {
     console.error('Error uploading file:', error.message);
-    res.status(500).json({ error: `An error occurred while sharing the file: ${error.message}` });
+    res.status(500).json({ error: 'An error occurred while sharing the file.' });
   }
 });
 
