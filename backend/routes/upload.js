@@ -51,7 +51,7 @@ router.post('/file', upload.single('shareFile'), async (req, res) => {
       };
       res.json({ id: id, type: type, originalname: req.file.originalname });
     } else {
-      throw new Error('Failed to upload file to transfer.sh: Unexpected response.');
+      throw new Error(`Failed to upload file to transfer.sh: Unexpected response. Status: ${response.status}, Data: ${response.data}`);
     }
   } catch (error) {
     console.error('Error uploading file:', error.message);
