@@ -1,15 +1,15 @@
 const express = require('express');
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
-const { encrypt } = require('../utils/cryptoUtils');
+const axios = require('axios');
+const FormData = require('form-data');
+const { encrypt, decrypt } = require('../utils/cryptoUtils');
 const generateId = require('../utils/generateId');
 
 const router = express.Router();
 
 // Configure Multer for file uploads
 const upload = multer({
-  storage: multer.memoryStorage() // Store file in memory to encrypt before saving
+  storage: multer.memoryStorage() // Store file in memory
 });
 
 // Handle text upload
@@ -24,30 +24,44 @@ router.post('/text', (req, res) => {
 });
 
 // Handle file/image upload
-router.post('/file', upload.single('shareFile'), (req, res) => {
+router.post('/file', upload.single('shareFile'), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded.' });
   }
-  const id = generateId();
-  const type = req.file.mimetype.startsWith('image/') ? 'image' : 'file';
-  const ext = path.extname(req.file.originalname);
-  const filename = id + ext;
-  const storagePath = type === 'image' ? path.join(__dirname, '../storage/images') : path.join(__dirname, '../storage/files');
-  const filePath = path.join(storagePath, filename);
 
-  const { iv, encryptedData } = encrypt(req.file.buffer);
+  try {
+    const { iv, encryptedData } = encrypt(req.file.buffer);
 
-  fs.writeFileSync(filePath, Buffer.from(encryptedData, 'hex'));
+    const formData = new FormData();
+    formData.append('file', Buffer.from(encryptedData, 'hex'), {
+      filename: req.file.originalname,
+      contentType: req.file.mimetype
+    });
 
-  global.db.files[id] = {
-    filename: filename,
-    originalname: req.file.originalname,
-    mimetype: req.file.mimetype,
-    size: req.file.size,
-    path: filePath,
-    iv: iv
-  };
-  res.json({ id: id, type: type, originalname: req.file.originalname });
+    const response = await axios.post('http://0x0.st', formData, {
+      headers: formData.getHeaders()
+    });
+
+    if (response.status === 200 && response.data.trim().startsWith('http')) {
+      const id = generateId();
+      const type = req.file.mimetype.startsWith('image/') ? 'image' : 'file';
+      const fileUrl = response.data.trim();
+
+      global.db.files[id] = {
+        url: fileUrl,
+        originalname: req.file.originalname,
+        mimetype: req.file.mimetype,
+        size: req.file.size,
+        iv: iv
+      };
+      res.json({ id: id, type: type, originalname: req.file.originalname });
+    } else {
+      throw new Error('Failed to upload file to 0x0.st');
+    }
+  } catch (error) {
+    console.error('Error uploading file:', error.message);
+    res.status(500).json({ error: 'An error occurred while sharing the file.' });
+  }
 });
 
 module.exports = router;

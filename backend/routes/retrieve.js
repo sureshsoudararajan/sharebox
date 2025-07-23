@@ -1,11 +1,10 @@
 const express = require('express');
-const path = require('path');
-const fs = require('fs');
+const axios = require('axios');
 const { decrypt } = require('../utils/cryptoUtils');
 
 const router = express.Router();
 
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   const id = req.params.id;
 
   // Check for text content
@@ -16,22 +15,22 @@ router.get('/:id', (req, res) => {
   // Check for file content
   if (global.db.files[id]) {
     const fileInfo = global.db.files[id];
-    const filePath = fileInfo.path;
+    try {
+      const response = await axios.get(fileInfo.url, {
+        responseType: 'arraybuffer'
+      });
 
-    if (fs.existsSync(filePath)) {
-      const encryptedBuffer = fs.readFileSync(filePath);
+      const encryptedBuffer = Buffer.from(response.data, 'binary');
       const decryptedBuffer = decrypt(encryptedBuffer.toString('hex'), fileInfo.iv);
 
-      if (fileInfo.mimetype.startsWith('image/')) {
-        res.set('Content-Type', fileInfo.mimetype);
-        return res.send(decryptedBuffer);
-      } else {
-        res.set('Content-Type', fileInfo.mimetype);
+      res.set('Content-Type', fileInfo.mimetype);
+      if (!fileInfo.mimetype.startsWith('image/')) {
         res.set('Content-Disposition', `attachment; filename="${fileInfo.originalname}"`);
-        return res.send(decryptedBuffer);
       }
-    } else {
-      return res.status(404).json({ error: 'File not found.' });
+      return res.send(decryptedBuffer);
+    } catch (error) {
+      console.error('Error retrieving file:', error.message);
+      return res.status(500).json({ error: 'Failed to retrieve file.' });
     }
   }
 
