@@ -1,15 +1,7 @@
 const express = require('express');
-const multer = require('multer');
-const axios = require('axios');
-const { encrypt } = require('../utils/cryptoUtils');
 const generateId = require('../utils/generateId');
 
 const router = express.Router();
-
-// Configure Multer for file uploads
-const upload = multer({
-  storage: multer.memoryStorage() // Store file in memory
-});
 
 // Handle text upload
 router.post('/text', (req, res) => {
@@ -20,52 +12,6 @@ router.post('/text', (req, res) => {
   const id = generateId();
   global.db.texts[id] = text;
   res.json({ id: id, type: 'text' });
-});
-
-// Handle file/image upload
-router.post('/file', upload.single('shareFile'), async (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: 'No file uploaded.' });
-  }
-
-  try {
-    const encryptedBuffer = req.file.buffer;
-
-    const safeFilename = encodeURIComponent(req.file.originalname);
-    const response = await axios.put(`https://transfer.sh/${safeFilename}`, encryptedBuffer, {
-      headers: {
-        'Content-Type': 'application/octet-stream'
-      }
-    });
-
-    if (response.status === 200 && response.data.trim().startsWith('http')) {
-      const id = generateId();
-      const type = req.file.mimetype.startsWith('image/') ? 'image' : 'file';
-      const fileUrl = response.data.trim();
-
-      global.db.files[id] = {
-        url: fileUrl,
-        originalname: req.file.originalname,
-        mimetype: req.file.mimetype,
-        size: req.file.size,
-      };
-      res.json({ id: id, type: type, originalname: req.file.originalname });
-    } else {
-      throw new Error(`Failed to upload file to transfer.sh: Unexpected response. Status: ${response.status}, Data: ${response.data}`);
-    }
-  } catch (error) {
-    console.error('Error uploading file:', error.message);
-    if (error.response) {
-      console.error('Axios error response data:', error.response.data);
-      console.error('Axios error response status:', error.response.status);
-      console.error('Axios error response headers:', error.response.headers);
-    } else if (error.request) {
-      console.error('Axios error request:', error.request);
-    } else {
-      console.error('Axios error config:', error.config);
-    }
-    res.status(500).json({ error: `An error occurred while sharing the file: ${error.message}` });
-  }
 });
 
 module.exports = router;

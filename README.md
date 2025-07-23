@@ -5,12 +5,8 @@ A simple file/image/text sharing website without login, allowing one user to pas
 ## Features
 
 *   Text paste and copy
-*   Image upload and preview
-*   File upload and download
 *   Shareable link
 *   No login
-
-**Note:** This application uses an external service (0x0.st) for file storage to ensure persistence across deployments.
 
 ## Project Structure
 
@@ -19,8 +15,8 @@ sharebox/
 ├── backend/
 │   ├── server.js                # Express app
 │   ├── routes/
-│   │   ├── upload.js            # Handle uploads (text, files, images)
-│   │   ├── retrieve.js          # Serve text/file/image by ID
+│   │   ├── upload.js            # Handle uploads (text)
+│   │   ├── retrieve.js          # Serve text by ID
 │   └── utils/
 │       └── generateId.js        # Unique ID generator
 │

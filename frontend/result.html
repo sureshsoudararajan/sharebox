@@ -5,6 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ShareBox - Your Link</title>
     <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .copy-popup {
+            visibility: hidden;
+            min-width: 150px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 5px;
+            padding: 8px 10px;
+            position: fixed;
+            z-index: 1;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 30px;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .copy-popup.show {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -17,24 +40,27 @@
         <a href="/">Share something new</a>
     </div>
 
+    <div id="copy-popup" class="copy-popup">Link Copied!</div>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const id = urlParams.get('id');
             const type = urlParams.get('type');
-            const originalname = urlParams.get('originalname');
 
-            let shareLink = `${window.location.origin}/view?id=${id}&type=${type}`;
-            if (originalname) {
-                shareLink += `&originalname=${encodeURIComponent(originalname)}`;
-            }
+            const shareLink = `${window.location.origin}/view?id=${id}&type=${type}`;
             document.getElementById('share-link').value = shareLink;
 
             document.getElementById('copy-link-btn').addEventListener('click', () => {
                 const linkInput = document.getElementById('share-link');
                 linkInput.select();
                 document.execCommand('copy');
-                alert('Link copied to clipboard!');
+
+                const popup = document.getElementById('copy-popup');
+                popup.classList.add('show');
+                setTimeout(() => {
+                    popup.classList.remove('show');
+                }, 2000); // Hide after 2 seconds
             });
         });
     </script>
