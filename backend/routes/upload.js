@@ -2,7 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const axios = require('axios');
 const FormData = require('form-data');
-const { encrypt, decrypt } = require('../utils/cryptoUtils');
+const { encrypt } = require('../utils/cryptoUtils');
 const generateId = require('../utils/generateId');
 
 const router = express.Router();
